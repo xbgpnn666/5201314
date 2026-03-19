@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💌 给你的情书 💌</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f9e5e5;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            padding: 20px;
+        }
+        
+        .envelope-container {
+            max-width: 700px;
+            width: 100%;
+        }
+        
+        /* 信封样式 */
+        .envelope {
+            background: #fef3e4;
+            border-radius: 15px 15px 15px 15px;
+            box-shadow: 0 25px 45px -15px rgba(150, 80, 80, 0.4);
+            position: relative;
+            padding: 30px 30px 50px;
+            border: 1px solid #fad5b3;
+            transition: all 0.5s;
+        }
+        
+        .envelope:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 30px;
+            background: linear-gradient(135deg, #fad5b3 50%, transparent 50%);
+            background-size: 20px 20px;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .envelope-seal {
+            position: absolute;
+            top: 35px;
+            right: 40px;
+            font-size: 32px;
+            transform: rotate(15deg);
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
+            animation: sealGlow 2s infinite;
+        }
+        
+        @keyframes sealGlow {
+            0%, 100% { opacity: 0.8; transform: rotate(15deg) scale(1); }
+            50% { opacity: 1; transform: rotate(15deg) scale(1.1); }
+        }
+        
+        .stamp {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            background: #ffd0b0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            border: 3px dashed #d9986a;
+            color: #b55a3a;
+            transform: rotate(-10deg);
+        }
+        
+        .to-address {
+            font-size: 20px;
+            color: #a66b56;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px dotted #f0c0a0;
+            font-style: italic;
+            letter-spacing: 2px;
+        }
+        
+        .password-area {
+            text-align: center;
+            padding: 20px 20px 30px;
+            background: rgba(255, 235, 215, 0.5);
+            border-radius: 100px 100px 30px 30px;
+            margin: 25px 0;
+        }
+        
+        .password-area h3 {
+            font-size: 26px;
+            color: #ac5e4a;
+            font-weight: normal;
+            margin-bottom: 20px;
+            font-family: 'Georgia', serif;
+        }
+        
+        .password-input-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .password-input-wrapper input {
+            padding: 18px 25px;
+            font-size: 20px;
+            border: 2px solid #f7c9ae;
+            background: white;
+            border-radius: 50px;
+            width: 250px;
+            outline: none;
+            font-family: 'Georgia', serif;
+            text-align: center;
+            letter-spacing: 5px;
+            color: #b55a3a;
+            box-shadow: 0 5px 15px rgba(230, 150, 120, 0.2);
+        }
+        
+        .password-input-wrapper input:focus {
+            border-color: #e6977c;
+            box-shadow: 0 8px 20px rgba(220, 120, 90, 0.3);
+        }
+        
+        .password-input-wrapper button {
+            padding: 18px 40px;
+            background: #e6977c;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Georgia', serif;
+            letter-spacing: 2px;
+            box-shadow: 0 5px 15px rgba(200, 100, 70, 0.4);
+        }
+        
+        .password-input-wrapper button:hover {
+            background: #d17a5e;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(190, 90, 60, 0.5);
+        }
+        
+        .hint {
+            color: #b58b7a;
+            font-size: 16px;
+            margin-top: 15px;
+            font-style: italic;
+        }
+        
+        /* 信件内容样式 - 第一封信 */
+        .letter-content {
+            display: none;
+            background: #fffcf5;
+            border-radius: 15px;
+            padding: 40px 35px;
+            box-shadow: inset 0 0 30px #fae2ce, 0 15px 30px rgba(150, 80, 50, 0.2);
+            position: relative;
+            margin-top: 20px;
+            border: 1px solid #fadbc0;
+            animation: letterOpen 1.2s ease;
+        }
+        
+        /* 第二封信样式 */
+        .second-letter {
+            display: none;
+            background: #fff0f0;
+            border-radius: 15px;
+            padding: 40px 35px;
+            box-shadow: inset 0 0 30px #fad2d2, 0 15px 30px rgba(150, 80, 80, 0.25);
+            position: relative;
+            margin-top: 20px;
+            border: 1px solid #fcc2c2;
+            animation: letterOpen 1.2s ease;
+        }
+        
+        .second-letter:before {
+            content: '💕';
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 30px;
+            opacity: 0.2;
+        }
+        
+        .second-letter:after {
+            content: '💕';
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            font-size: 40px;
+            opacity: 0.15;
+        }
+        
+        /* 道歉泡泡页面样式 */
+        .apology-page {
+            display: none;
+            background: #fff5f0;
+            border-radius: 15px;
+            padding: 30px 25px;
+            box-shadow: inset 0 0 30px #fad2c0, 0 15px 30px rgba(150, 80, 60, 0.2);
+            position: relative;
+            margin-top: 20px;
+            border: 1px solid #fcc2aa;
+            animation: bubblePop 0.8s ease;
+            min-height: 450px;
+        }
+        
+        @keyframes bubblePop {
+            0% { opacity: 0; transform: scale(0.8); }
+            80% { transform: scale(1.02); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .bubbles-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+            min-height: 250px;
+            align-items: center;
+        }
+        
+        .bubble {
+            background: #ffe6e0;
+            border-radius: 30px 30px 30px 5px;
+            padding: 15px 20px;
+            font-size: 18px;
+            color: #a55a4a;
+            box-shadow: 0 5px 15px rgba(210, 120, 90, 0.2);
+            border: 1px solid #ffccbc;
+            animation: bubbleFloat 3s ease-in-out infinite;
+            max-width: 250px;
+            text-align: center;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .bubble:hover {
+            transform: scale(1.05);
+            background: #ffe0d4;
+        }
+        
+        .bubble:nth-child(odd) {
+            animation-delay: 0.5s;
+            background: #ffe6e6;
+        }
+        
+        .bubble:nth-child(3n) {
+            animation-delay: 1s;
+            background: #ffe0f0;
+        }
+        
+        @keyframes bubbleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .apology-title {
+            font-size: 28px;
+            color: #b55a3a;
+            text-align: center;
+            margin-bottom: 10px;
+            font-family: 'Georgia', serif;
+        }
+        
+        .apology-subtitle {
+            text-align: center;
+            color: #b88d78;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        @keyframes letterOpen {
+            0% { opacity: 0; transform: scale(0.9) rotate(-2deg); }
+            100% { opacity: 1; transform: scale(1) rotate(0); }
+        }
+        
+        .letter-content:before {
+            content: '❤️';
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            font-size: 25px;
+            opacity: 0.2;
+        }
+        
+        .letter-content:after {
+            content: '❤️';
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            font-size: 35px;
+            opacity: 0.15;
+        }
+        
+        .date {
+            text-align: right;
+            color: #b28168;
+            margin-bottom: 30px;
+            font-style: italic;
+            font-size: 18px;
+            border-bottom: 1px dashed #dbb69c;
+            padding-bottom: 10px;
+        }
+        
+        .greeting {
+            font-size: 28px;
+            color: #a45d48;
+            margin-bottom: 25px;
+            font-weight: normal;
+            text-align: center;
+        }
+        
+        .letter-text {
+            font-size: 20px;
+            line-height: 1.9;
+            color: #5d3f34;
+            margin-bottom: 30px;
+            white-space: pre-wrap;
+            text-align: justify;
+            padding: 0 10px;
+        }
+        
+        /* 原谅选择区域 */
+        .forgiveness-section {
+            text-align: center;
+            margin: 30px 0 20px;
+            padding: 20px;
+            background: rgba(255, 235, 225, 0.5);
+            border-radius: 60px;
+            border-top: 2px dashed #e6b5a0;
+        }
+        
+        .forgiveness-question {
+            font-size: 24px;
+            color: #ac5e4a;
+            margin-bottom: 20px;
+            font-family: 'Georgia', serif;
+        }
+        
+        .forgiveness-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .forgive-btn {
+            padding: 15px 45px;
+            font-size: 22px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Georgia', serif;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .forgive-yes {
+            background: #e6977c;
+            color: white;
+        }
+        
+        .forgive-yes:hover {
+            background: #d17a5e;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(200, 100, 70, 0.4);
+        }
+        
+        .forgive-no {
+            background: #d9b5a5;
+            color: white;
+        }
+        
+        .forgive-no:hover {
+            background: #c7a08e;
+            transform: translateY(-3px);
+        }
+        
+        .apology-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0 10px;
+            flex-wrap: wrap;
+        }
+        
+        .signature-area {
+            text-align: right;
+            margin-top: 30px;
+            border-top: 2px solid #f0cfb5;
+            padding-top: 25px;
+        }
+        
+        .signature-name {
+            font-size: 28px;
+            color: #ac5e4a;
+            font-family: 'Brush Script MT', cursive;
+            margin-bottom: 5px;
+        }
+        
+        .error-msg {
+            color: #c06a5a;
+            min-height: 30px;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .apology-error {
+            color: #c06a5a;
+            font-size: 16px;
+            margin: 10px 0;
+            min-height: 24px;
+            text-align: center;
+        }
+        
+        .floating-flowers {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .flower {
+            position: absolute;
+            font-size: 20px;
+            opacity: 0.15;
+            animation: flowerFloat 15s linear infinite;
+        }
+        
+        @keyframes flowerFloat {
+            0% { transform: translateY(100vh) rotate(0deg); }
+            100% { transform: translateY(-20vh) rotate(360deg); }
+        }
+        
+        .back-to-forgive {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-btn {
+            background: #e6b5a0;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .back-btn:hover {
+            background: #d49c84;
+        }
+    </style>
+</head>
+<body>
+    <div class="floating-flowers" id="flowersContainer"></div>
+
+    <div class="envelope-container">
+        <div class="envelope" id="envelope">
+            <div class="envelope-seal">💮</div>
+            <div class="stamp">💌</div>
+            
+            <!-- 密码锁屏部分 -->
+            <div id="lockSection">
+                <div class="to-address">✨ To: 我深爱的鱼仔 ✨</div>
+                
+                <div class="password-area">
+                    <h3>🔐 这封信需要密码才能打开哟</h3>
+                    <p style="color: #b88d78; margin-bottom: 15px;">输入只有我们才知道的数字吧～</p>
+                    
+                    <div class="password-input-wrapper">
+                        <input type="password" id="secretCode" placeholder="* * * * * *" maxlength="8">
+                        <button onclick="unlockLetter()">开 启</button>
+                    </div>
+                    
+                    <div class="error-msg" id="errorMessage"></div>
+                    <div class="hint">💭 提示：是我们在一起的日子</div>
+                </div>
+            </div>
+            
+            <!-- 第一封信内容 -->
+            <div class="letter-content" id="letterSection">
+                <div class="date">2026年 春分</div>
+                <div class="greeting">亲爱的于子晋小朋友：</div>
+                
+                <div class="letter-text">
+                    写下这些字的时候<br>
+                    也不知道这个礼物<br>
+                    算不算一个意料之外的惊喜<br>
+                    但我知道<br>
+                    你不想在贺卡里看到尬尬的文字hhhh<br>
+                    那就只有让你来这里<br>
+                    看小作文了！！！<br><br>
+                    
+                    不能见面的日子里，也敲想你<br>
+                    远隔山海与你共存<br>
+                    说心里话，吵归吵，闹归闹<br>
+                    还是要求着和老婆大人和好<br><br>
+                    
+                    亲爱的宝宝不生气气了好不好～<br>
+                    吵一万次架，那就和好一万零一次<br>
+                    再大的争吵也抵不过宝宝你的一个拥抱<br><br>
+                    
+                    我好爱你，是争吵后依然选择相爱<br>
+                    我在慢慢变得更好，也在慢慢等待你的到来<br>
+                    愿我们能一次次经受住琐碎的考验<br>
+                    对我而言，你永远<br>
+                    都是星辰大海无可替代<br><br>
+                    
+                    每当看到你生气不高兴时<br>
+                    都好希望你不要哭，因为我抱不到你呜呜呜<br>
+                    只愿吹过我的风，能代替我去拥抱你<br><br>
+                    
+                    我好像不是完美的伴侣，好像还有小脾气<br>
+                    也会有笨拙的时刻，会有不那么懂你的瞬间<br>
+                    但我希望，在你眼里<br>
+                    我依然是那个值得被你偏爱的人<br><br>
+                    
+                    也许新鲜感褪去，倦意也偶尔来袭<br>
+                    我们也会看见对方的不完美<br>
+                    待所有的伪装都卸下<br>
+                    我依然觉得你可爱<br>
+                    依然毫不犹豫地想要在你身边<br><br>
+                    我们的故事<br>
+                    来日方长<br>
+                    
+                    下次见面，我们好好抱抱吧<br>
+                    把没见面的日子，都补回来<br>
+                </div>
+                
+                <!-- 新增：原谅选择区域 -->
+                <div class="forgiveness-section">
+                    <div class="forgiveness-question">亲爱的，你愿意原谅我吗～</div>
+                    <div class="forgiveness-buttons">
+                        <button class="forgive-btn forgive-yes" onclick="showSecondLetter()">算了勉为其难饶了你～</button>
+                        <button class="forgive-btn forgive-no" onclick="showApologyPage()">我很生气就不原谅！</button>
+                    </div>
+                </div>
+                
+                <div class="signature-area">
+                    <div class="signature-name">爱你的老张</div>
+                    <div style="color: #ac7a68;">❤️ 永远永远 ❤️</div>
+                </div>
+            </div>
+            
+            <!-- 新增：道歉泡泡页面 -->
+            <div class="apology-page" id="apologySection">
+                <div class="apology-title">🥺 宝宝别生气了嘛～</div>
+                <div class="apology-subtitle">(啊啊啊啊啊居然不原谅我呜呜呜)</div>
+                
+                <div class="bubbles-container" id="bubblesContainer">
+                    <!-- 道歉泡泡会通过JS动态生成 -->
+                </div>
+                
+                <!-- 道歉页面的原谅选择 -->
+                <div class="forgiveness-section" style="margin-top: 10px;">
+                    <div class="forgiveness-question">💕 现在可以原谅我了吗？</div>
+                    <div class="forgiveness-buttons">
+                        <button class="forgive-btn forgive-yes" onclick="showSecondLetter()">好吧好吧，mua</button>
+                        <button class="forgive-btn forgive-no" onclick="showApologyError()">就不就不，哼</button>
+                    </div>
+                    <div class="apology-error" id="apologyErrorMsg"></div>
+                </div>
+                
+                <div class="back-to-forgive">
+                    <button class="back-btn" onclick="backToFirstLetter()">← 返回第一封信</button>
+                </div>
+            </div>
+            
+            <!-- 新增：第二封信 -->
+            <div class="second-letter" id="secondLetterSection">
+                <div class="date">2026年 春分</div>
+                <div class="greeting">我最最亲爱的鱼仔：</div>
+                
+                <div class="letter-text">
+                    谢谢你愿意原谅我 ❤️<br><br>
+                    
+                    你的宽容让我更加懂得珍惜<br>
+                    你的温柔是我这辈子最大的幸运<br><br>
+
+
+​                    
+​                    想和你一起去很多很多地方<br>
+​                    吃很多很多好吃的<br>
+​                    拍很多很多合照<br>
+​                    然后一起慢慢变老<br><br>
+​                    
+​                    但在结束这封信前<br>
+​                    还有怪尴尬的事儿<br>
+​                    虽然我笨笨<br>
+​                    但也知道<br>
+​                    你换了背景呜呜呜<br>
+​                    你取消了好多置顶呜呜呜<br><br>
+​                    
+​                    如果你真的不生气气啦<br>
+​                    就...<br>
+​                    弄回来...<br>
+​                    好不好...<br>
+​                    谢谢你...<br><br>
+​                    
+                    当然还有最后一个小提示：<br>
+                    这个花篮可以浇水的哟<br>
+                    虽然但是你马上就要旅游了<br>
+                    浇水可以存活的久一点点嘿嘿<br><br>
+                    
+                    <全信终>
+                    
+                </div>
+                
+                <div class="signature-area">
+                    <div class="signature-name">一直爱着你的老张</div>
+                    <div style="color: #ac7a68;">💕 此生不负 💕</div>
+                </div>
+                
+                <!-- 第二封信底部增加一个小惊喜 -->
+                <div style="text-align: center; margin-top: 30px;">
+                    <span style="font-size: 30px;">💝</span>
+                    <p style="color: #b55a3a;">谢谢你，愿意继续爱我</p>
+                </div>
+                
+                <div class="back-to-forgive">
+                    <button class="back-btn" onclick="backToFirstLetter()">← 重来一遍</button>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px; color: #cfa58d; font-size: 14px;">
+                ✉️ 寄件人：深爱着你也是你深爱着的zyh
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 生成漂浮的花朵
+        function createFlowers() {
+            const container = document.getElementById('flowersContainer');
+            const flowers = ['🌸', '🌼', '🌺', '🌷', '🌹', '💐', '🌻', '🌿'];
+            
+            for (let i = 0; i < 20; i++) {
+                const flower = document.createElement('div');
+                flower.className = 'flower';
+                flower.innerHTML = flowers[Math.floor(Math.random() * flowers.length)];
+                flower.style.left = Math.random() * 100 + '%';
+                flower.style.animationDelay = Math.random() * 10 + 's';
+                flower.style.animationDuration = (Math.random() * 10 + 15) + 's';
+                container.appendChild(flower);
+            }
+        }
+        
+        // 生成道歉泡泡
+        function createApologyBubbles() {
+            const container = document.getElementById('bubblesContainer');
+            container.innerHTML = ''; // 清空
+            
+            const apologies = [
+                '🥺 我错了嘛～',
+                '💔 宝宝不生气',
+                '😭 以后都听你的',
+                '💝 你最好了',
+                '🌸 原谅我好不好',
+                '🥰 给你比心心',
+                '🍬 请你吃糖糖',
+                '💌 我写了情书',
+                '🌹 你是最美的',
+                '💕 爱你一万年',
+                '😘 亲亲抱抱举高高',
+                '🎀 以后不惹你生气了',
+                '💖 你最最最可爱',
+                '🍭 我的错我的错',
+                '🌈 有你在的每一天都是晴天',
+                '⭐ 你是我的小星星',
+                '🫂 抱抱就不气了',
+                '🎈 气球飞走了，气也飞走吧',
+                '☕️ 请你喝奶茶赔罪',
+                '🍰 带你去吃好吃的',
+                '🧸 给你买小熊',
+                '💝 我的心都是你的'
+            ];
+            
+            // 随机选15个泡泡
+            const shuffled = apologies.sort(() => 0.5 - Math.random());
+            const selected = shuffled.slice(0, 15);
+            
+            selected.forEach(text => {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.innerHTML = text;
+                
+                // 点击泡泡弹出小提示（增加趣味性）
+                bubble.addEventListener('click', function() {
+                    this.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 200);
+                });
+                
+                container.appendChild(bubble);
+            });
+        }
+        
+        createFlowers();
+    
+        function unlockLetter() {
+            // 在这里设置密码
+            const correctCode = "20201128";  // ← 修改成你们的纪念日或其他密码
+            
+            const input = document.getElementById('secretCode');
+            const errorDiv = document.getElementById('errorMessage');
+            const lockSection = document.getElementById('lockSection');
+            const letterSection = document.getElementById('letterSection');
+            
+            if (input.value === correctCode) {
+                lockSection.style.display = 'none';
+                letterSection.style.display = 'block';
+                
+                // 添加一些小星星效果
+                const envelope = document.getElementById('envelope');
+                envelope.style.transform = 'translateY(-5px)';
+                setTimeout(() => {
+                    envelope.style.transform = '';
+                }, 300);
+            } else {
+                errorDiv.innerHTML = '💔 密码不对哦，再想想我们重要的日子？';
+                input.value = '';
+                input.focus();
+                
+                // 抖动效果
+                const envelope = document.getElementById('envelope');
+                envelope.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    envelope.style.animation = '';
+                }, 500);
+            }
+        }
+        
+        // 显示第二封信
+        function showSecondLetter() {
+            document.getElementById('letterSection').style.display = 'none';
+            document.getElementById('apologySection').style.display = 'none';
+            document.getElementById('secondLetterSection').style.display = 'block';
+        }
+        
+        // 显示道歉泡泡页面
+        function showApologyPage() {
+            document.getElementById('letterSection').style.display = 'none';
+            document.getElementById('apologySection').style.display = 'block';
+            createApologyBubbles(); // 每次进入都重新生成泡泡
+        }
+        
+        // 返回第一封信
+        function backToFirstLetter() {
+            document.getElementById('apologySection').style.display = 'none';
+            document.getElementById('letterSection').style.display = 'block';
+            document.getElementById('apologyErrorMsg').innerHTML = ''; // 清除错误提示
+        }
+        
+        // 道歉页面选"否"时的错误提示
+        function showApologyError() {
+            const errorDiv = document.getElementById('apologyErrorMsg');
+            errorDiv.innerHTML = '💔 必须选择"原谅"嘛嘛嘛～我真的知道错了嘛！';
+            
+            // 让错误提示闪烁一下
+            errorDiv.style.animation = 'shake 0.5s';
+            setTimeout(() => {
+                errorDiv.style.animation = '';
+            }, 500);
+            
+            // 再生成几个新泡泡表示着急
+            createApologyBubbles(); 
+        }
+        
+        // 回车键
+        document.getElementById('secretCode').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                unlockLetter();
+            }
+        });
+        
+        // 添加抖动动画
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                20%, 60% { transform: translateX(-8px); }
+                40%, 80% { transform: translateX(8px); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
